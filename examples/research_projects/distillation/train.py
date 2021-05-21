@@ -28,9 +28,9 @@ import torch
 from distiller import Distiller
 from lm_seqs_dataset import LmSeqsDataset
 from transformers import (
-	AlbertConfig,
-	AlbertForMaskedLM, 
-	AlbertTokenizer,
+    AlbertConfig,
+    AlbertForMaskedLM, 
+    AlbertTokenizer,
     BertConfig,
     BertForMaskedLM,
     BertTokenizer,
@@ -89,8 +89,8 @@ def sanity_checks(args):
 
 
 def freeze_pos_embeddings(student, args):
-	if args.student_type == "albert":   # for later use, not using as of now. 
-		student.albert.embeddings.position_embeddings.weight.requires_grad = False 
+    if args.student_type == "albert":   # for later use, not using as of now. 
+        student.albert.embeddings.position_embeddings.weight.requires_grad = False 
     if args.student_type == "roberta":
         student.roberta.embeddings.position_embeddings.weight.requires_grad = False
     elif args.student_type == "gpt2":
