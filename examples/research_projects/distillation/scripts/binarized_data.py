@@ -23,7 +23,7 @@ import time
 
 import numpy as np
 
-from transformers import BertTokenizer, GPT2Tokenizer, RobertaTokenizer
+from transformers import AlbertTokenizer, BertTokenizer, GPT2Tokenizer, RobertaTokenizer
 
 
 logging.basicConfig(
@@ -37,13 +37,17 @@ def main():
         description="Preprocess the data to avoid re-doing it several times by (tokenization + token_to_ids)."
     )
     parser.add_argument("--file_path", type=str, default="data/dump.txt", help="The path to the data.")
-    parser.add_argument("--tokenizer_type", type=str, default="bert", choices=["bert", "roberta", "gpt2"])
+    parser.add_argument("--tokenizer_type", type=str, default="bert", choices=["albert", "bert", "roberta", "gpt2"])
     parser.add_argument("--tokenizer_name", type=str, default="bert-base-uncased", help="The tokenizer to use.")
     parser.add_argument("--dump_file", type=str, default="data/dump", help="The dump file prefix.")
     args = parser.parse_args()
 
     logger.info(f"Loading Tokenizer ({args.tokenizer_name})")
-    if args.tokenizer_type == "bert":
+    if args.tokenizer_type == "albert":
+        tokenizer = AlbertTokenizer.from_pretrained(args.tokenizer_name)
+        bos = tokenizer.special_tokens_map["cls_token"]  # `[CLS]`
+        sep = tokenizer.special_tokens_map["sep_token"]  # `[SEP]`
+    elif args.tokenizer_type == "bert":
         tokenizer = BertTokenizer.from_pretrained(args.tokenizer_name)
         bos = tokenizer.special_tokens_map["cls_token"]  # `[CLS]`
         sep = tokenizer.special_tokens_map["sep_token"]  # `[SEP]`
