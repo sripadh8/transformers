@@ -64,13 +64,13 @@ def sanity_checks(args):
     assert (args.alpha_mlm > 0.0 and args.alpha_clm == 0.0) or (args.alpha_mlm == 0.0 and args.alpha_clm > 0.0)
     if args.mlm:
         assert os.path.isfile(args.token_counts)
-        assert (args.student_type in ["roberta", "distilbert"]) and (args.teacher_type in ["roberta", "bert", "albert"])
+        assert (args.student_type in ["albert", "roberta", "distilbert"]) and (args.teacher_type in ["roberta", "bert", "albert"])
     else:
         assert (args.student_type in ["gpt2"]) and (args.teacher_type in ["gpt2"])
 
     assert args.teacher_type == args.student_type or (
         args.student_type == "distilbert" and args.teacher_type == "bert"
-    ) or (
+    ) or (  # for later use. 
     	args.student_type == "distilbert" and args.teacher_type == "albert")
 
     assert os.path.isfile(args.student_config)
@@ -119,9 +119,9 @@ def main():
     parser.add_argument(
         "--student_type",
         type=str,
-        choices=["distilbert", "roberta", "gpt2"],
+        choices=["albert", "distilbert", "roberta", "gpt2"],
         required=True,
-        help="The student type (DistilBERT, RoBERTa).",
+        help="The student type (ALBERT, DistilBERT, RoBERTa).",
     )
     parser.add_argument("--student_config", type=str, required=True, help="Path to the student configuration.")
     parser.add_argument(
@@ -129,7 +129,7 @@ def main():
     )
 
     parser.add_argument(
-        "--teacher_type", choices=["bert", "roberta", "gpt2"], required=True, help="Teacher type (BERT, RoBERTa)."
+        "--teacher_type", choices=["albert", "bert", "roberta", "gpt2"], required=True, help="Teacher type (ALBERT, BERT, RoBERTa)."
     )
     parser.add_argument("--teacher_name", type=str, required=True, help="The teacher model.")
 
