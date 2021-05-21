@@ -37,7 +37,7 @@ def git_log(folder_path: str):
     """
     Log commit info.
     """
-    repo = git.Repo(search_parent_directories=True)
+    repo = git.Repo(folder_path, search_parent_directories=True)
     repo_infos = {
         "repo_id": str(repo),
         "repo_sha": str(repo.head.object.hexsha),
