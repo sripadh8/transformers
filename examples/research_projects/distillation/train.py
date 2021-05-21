@@ -28,6 +28,9 @@ import torch
 from distiller import Distiller
 from lm_seqs_dataset import LmSeqsDataset
 from transformers import (
+	AlbertConfig,
+	AlbertForMaskedLM, 
+	AlbertTokenizer,
     BertConfig,
     BertForMaskedLM,
     BertTokenizer,
@@ -47,6 +50,7 @@ from utils import git_log, init_gpu_params, logger, set_seed
 MODEL_CLASSES = {
     "distilbert": (DistilBertConfig, DistilBertForMaskedLM, DistilBertTokenizer),
     "roberta": (RobertaConfig, RobertaForMaskedLM, RobertaTokenizer),
+    "albert": (AlbertConfig, AlbertForMaskedLM, AlbertTokenizer),
     "bert": (BertConfig, BertForMaskedLM, BertTokenizer),
     "gpt2": (GPT2Config, GPT2LMHeadModel, GPT2Tokenizer),
 }
@@ -60,13 +64,15 @@ def sanity_checks(args):
     assert (args.alpha_mlm > 0.0 and args.alpha_clm == 0.0) or (args.alpha_mlm == 0.0 and args.alpha_clm > 0.0)
     if args.mlm:
         assert os.path.isfile(args.token_counts)
-        assert (args.student_type in ["roberta", "distilbert"]) and (args.teacher_type in ["roberta", "bert"])
+        assert (args.student_type in ["roberta", "distilbert"]) and (args.teacher_type in ["roberta", "bert", "albert"])
     else:
         assert (args.student_type in ["gpt2"]) and (args.teacher_type in ["gpt2"])
 
     assert args.teacher_type == args.student_type or (
         args.student_type == "distilbert" and args.teacher_type == "bert"
-    )
+    ) or (
+    	args.student_type == "distilbert" and args.teacher_type == "albert")
+
     assert os.path.isfile(args.student_config)
     if args.student_pretrained_weights is not None:
         assert os.path.isfile(args.student_pretrained_weights)
@@ -83,6 +89,8 @@ def sanity_checks(args):
 
 
 def freeze_pos_embeddings(student, args):
+	if args.student_type == "albert":   # for later use, not using as of now. 
+		student.albert.embeddings.position_embeddings.weight.requires_grad = False 
     if args.student_type == "roberta":
         student.roberta.embeddings.position_embeddings.weight.requires_grad = False
     elif args.student_type == "gpt2":
